@@ -1,0 +1,350 @@
+{% style %}
+  .wrapper{
+        display: flex;
+        gap:5px;
+  }
+  .container-placeholder-image{
+       height: 533px;
+       max-width: 300px;
+  }
+  .16_9_container {
+        position: relative;
+        max-width: 533px;
+        height: 300px;
+        width: 100%;
+        background-color: #f6f6f6;
+  }
+  .9_16_container{
+        max-width: 300px;
+    width:100%;
+       height: 533px;
+         background-color: #f6f6f6;
+  }
+  .container-img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+  }
+
+     .product-link {
+        display:inline-block !important;
+        position:absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #3498db; /* You can change the color */
+        border: 2px solid #f6f6f6;
+        animation: pulse 1.5s infinite;
+        cursor: pointer;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 15px rgba(52, 152, 219, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+        }
+      }
+      .product-link {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #3498db; /* You can change the color */
+        border: 2px solid #f6f6f6;
+        position: relative;
+        animation: pulse 1.5s infinite;
+        cursor: pointer;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 15px rgba(52, 152, 219, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+        }
+      }
+      .product-link.one {
+        position: absolute;
+        right: 60%;
+        top: 31%;
+      }
+      .product-link.two {
+        position: absolute;
+        right: 65%;
+        top: 55%;
+      }
+      .product-link.three {
+        position: absolute;
+        right: 60%;
+        top: 70%;
+      }
+      .selected-product-image {
+        width: 250px;
+        height: 250px;
+        object-fit: cover;
+      }
+      .product-grid{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap:10px;
+        align-self: center;
+      }
+      .button {
+        background-color: #007BFF; /* Primary background color */
+        color: white; /* Text color */
+        padding: 6px 12px; /* Padding for button size */
+        border: none; /* No border */
+        border-radius: 2px; /* Rounded corners */
+        font-size: 14px; /* Font size */
+        font-weight: 600; /* Bold text */
+        cursor: pointer; /* Pointer cursor on hover */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        transition: all 0.3s ease; /* Smooth transition for hover effects */
+        text-decoration: none;
+      }
+
+      .button:hover {
+        background-color: #0056b3; /* Slightly darker green on hover */
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+      }
+
+      .button:focus {
+        outline: none; /* Remove default focus outline */
+        box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.3); /* Green focus ring */
+      }
+
+      .button:active {
+        background-color: #004085; /* Darker shade when clicked */
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Reduced shadow on click */
+      }
+  
+{% endstyle %}
+
+
+<div class="wrapper" style="max-width:{{ section.settings.max_width }}px;margin:0 auto;">
+    <div 
+      style="{% if section.settings.image_ratio == '16_9' %}
+          position: relative;
+          max-width: 533px;
+          height: 300px;
+          width: 100%;
+          background-color: #f6f6f6;
+        {% else %}
+          position: relative;
+          max-width: 300px;
+          width:100%;
+          height: 533px;
+          background-color: #f6f6f6;
+        {% endif %}"
+      >
+      {% if section.settings.image %}
+       
+        <img src="{{ section.settings.image | image_url }}" width="" height="" class="container-img" style="object-fit:{{section.settings.image_size}};">
+      {% else %}
+        {{ 'collection-1' |placeholder_svg_tag:'container-img'}}
+      {% endif %}
+      
+      
+      {% assign isBlockItemsExist = false %}
+      
+      {% for block in section.blocks %}
+        {% assign isBlockItemsExist = true %}
+        {%- case block.type -%}
+           {%- when 'product' -%}
+
+          {{ block.settings.product.featured_image }}
+
+            
+              <div
+                class="product-link"
+                style="position:absolute;top:{{block.settings.vertical_position}}px;right:{{ block.settings.horizontal_position }}px;"
+                data-url="{{ block.settings.product.url }}"
+                data-image="{{ block.settings.product.featured_image }}"
+              ></div>
+           
+        {% endcase %}
+      {% endfor %}
+
+     
+      {% if isBlockItemsExist != true %}
+          <h4>
+        Show Placeholder Item Image
+        </h4>
+      {% endif %}
+    </div>
+    {{ isBlockItemsExist|json }}
+    
+    <div class="product-grid">
+        <img class="selected-product-image" src="" />
+        <a href="" target="_blank" class="selected-product-url button">View Product</a>
+    </div>
+</div>
+
+<script>
+  console.log("HELLLO")
+  return
+    // Model Functions
+  const products = []; // This will hold product data if needed
+  
+  function addProduct(url, image) {
+    products.push({ url, image });
+  }
+  
+  // View Functions
+  const productGrid = document.querySelector(".product-grid");
+  const selectedProductImage = document.querySelector(".selected-product-image");
+  const selectedProductUrl = document.querySelector(".selected-product-url");
+  
+  function displayProductGrid() {
+    productGrid.style.display = "flex";
+  }
+  
+  function hideProductGrid() {
+    productGrid.style.display = "none";
+  }
+  
+  function updateSelectedProduct(url, image) {
+    selectedProductUrl.href = url;
+    selectedProductImage.src = image;
+  }
+  
+  // Controller Functions
+  function initialize() {
+    hideProductGrid();
+    
+    const productsElements = document.querySelectorAll(".product-link");
+    
+    productsElements.forEach((product) => {
+      product.addEventListener("click", (e) => {
+        const dataUrl = product.getAttribute("data-url");
+        const dataImage = product.getAttribute("data-image");
+        
+        // Add product to the list (if needed)
+        addProduct(dataUrl, dataImage);
+        
+        // Update the view with selected product
+        displayProductGrid();
+        updateSelectedProduct(dataUrl, dataImage);
+      });
+    });
+  }
+  
+  // Initialization
+  initialize();
+
+</script>
+
+
+
+
+{% schema %}
+  {
+    "name": "Sell Multiple Items",
+    "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "select",
+            "id": "image_ratio",
+            "label": "Image Ratio",
+            "options": [
+              {
+                "value": "16_9",
+                "label": "16:9"
+              },
+              {
+                "value": "9_16",
+                "label": "9:16"
+              }
+            ],
+            "default": "16_9"
+          },
+          {
+            "type": "select",
+            "id": "image_size",
+            "label": "Image Size",
+            "options": [
+              {
+                "value": "cover",
+                "label": "Cover"
+              },
+              {
+                "value": "contain",
+                "label": "Contain"
+              },
+              {
+                "value": "fill",
+                "label": "Fill"
+              },
+              {
+                "value": "scale-down",
+                "label": "Scale Down"
+              }
+            ],
+            "default": "cover"
+          },
+          {
+            "type": "text",
+            "id": "max_width",
+            "label": "Max Width",
+            "default": "1100"
+          }
+    ],
+    "blocks": 
+    [
+      {
+            "type": "product",
+            "name": "Item",
+            "settings":[
+                  {
+                      "type": "product",
+                      "id": "product",
+                      "label": "Link Product"
+                  },
+                  {
+                    "type": "range",
+                    "id": "vertical_position",
+                    "min": 10,
+                    "max": 100,
+                    "step": 1,
+                    "unit": "%",
+                    "label": "Vertical Position",
+                    "default":10
+                  },
+                  {
+                    "type": "range",
+                    "id": "horizontal_position",
+                    "min": 10,
+                    "max": 100,
+                    "step": 1,
+                    "unit": "%",
+                    "label": "Horizontal Position",
+                    "default":10
+                  },
+            ]
+      } 
+    ],
+   "presets": [
+    {
+      "name": "Sell Multiple Items",
+      "blocks": [
+        {
+          "type": "product"
+        }
+      ]
+    }
+  ]
+  }
+{% endschema %}
